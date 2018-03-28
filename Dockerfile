@@ -83,6 +83,9 @@ RUN mkdir -p /opt/steam/steamcmd \
  && wget -O- https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz \
         | tar xz -C /opt/steam/steamcmd --strip-components=1 \
  && rm -f /opt/steam/steamcmd/libstdc++.so* \
+ && chown -R root:root /opt/steam \
+ && chmod 755 /opt/steam/steamcmd/steam* \
+ && chmod 644 /opt/steam/steamcmd/*.so* \
  && ln -sfv ../../opt/steam/steamcmd/steam* /usr/bin
 
 USER amp
