@@ -1,0 +1,41 @@
+pipeline:
+
+  build:
+    image: spritsail/docker-build
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+    repo: amp-sc-dev
+
+  test:
+    image: docker
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+    commands:
+      - docker run -dt --rm amp-sc-dev steamcmd +info
+
+  publish:
+      image: spritsail/docker-publish
+      when: { branch: [ master ], event: [ push, tag, deployment ] }
+      volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+      secrets: [ docker_username, docker_password, microbadger_token ]
+      from: amp-sc-dev
+      repo: spritsail/amp-steamcmd
+
+#  downstream:
+#    image: plugins/downstream
+#    secrets: [ downstream_token ]
+#    when:
+#      event:  [ push, tag, deployment ]
+#      status: [ success ]
+#      branch: [ master ]
+#    server: https://drone.spritsail.io
+#    fork: true
+#    repositories:
+#      - spritsail/amp-ark
+#      - spritsail/amp-starbound
+
+  notify:
+    image: appleboy/drone-telegram
+    when: { status: [ success, failure ] }
+    secrets: [ telegram_token, telegram_to ]
+    message: |
+      *{{repo.owner}}/{{repo.name}} [{{commit.branch}}]*: Build #{{build.number}}: *{{uppercase build.status}}*
+      {{build.link}}
