@@ -79,13 +79,14 @@ COPY --from=builder ${OUTDIR}/ /
 RUN echo /usr/lib32 > /etc/ld.so.conf \
  && ldconfig && ldconfig -p
 
-RUN mkdir -p /opt/steam/steamcmd \
- && wget -O- https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz \
-        | tar xz -C /opt/steam/steamcmd --strip-components=1 \
- && rm -f /opt/steam/steamcmd/libstdc++.so* \
- && chown -R root:root /opt/steam \
- && chmod 755 /opt/steam/steamcmd/steam* \
- && chmod 644 /opt/steam/steamcmd/*.so* \
- && ln -sfv ../../opt/steam/steamcmd/steam* /usr/bin
+WORKDIR /opt/steamcmd
+
+RUN chown amp:amp /opt/steamcmd \
+ && wget -O- https://media.steampowered.com/client/steamcmd_linux.tar.gz \
+        | chpst -u amp:amp tar xz \
+ && rm -f linux32/libstdc++.so* \
+ && echo -e "#!/bin/sh\n\nexec $(pwd)/steamcmd.sh \$@" > /usr/bin/steamcmd \
+ && chmod 644 linux32/*.so* \
+ && chmod 755 linux32/steam* steamcmd.sh /usr/bin/steamcmd
 
 USER amp

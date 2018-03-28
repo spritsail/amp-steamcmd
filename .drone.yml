@@ -9,7 +9,7 @@ pipeline:
     image: docker
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     commands:
-      - docker run -t --rm amp-sc-dev steamcmd +info
+      - docker run -t --rm amp-sc-dev steamcmd +info +quit
 
   publish:
       image: spritsail/docker-publish
