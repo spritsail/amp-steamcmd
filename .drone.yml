@@ -19,23 +19,7 @@ pipeline:
       from: amp-sc-dev
       repo: spritsail/amp-steamcmd
 
-#  downstream:
-#    image: plugins/downstream
-#    secrets: [ downstream_token ]
-#    when:
-#      event:  [ push, tag, deployment ]
-#      status: [ success ]
-#      branch: [ master ]
-#    server: https://drone.spritsail.io
-#    fork: true
-#    repositories:
-#      - spritsail/amp-ark
-#      - spritsail/amp-starbound
-
   notify:
-    image: appleboy/drone-telegram
+    image: spritsail/notify
     when: { status: [ success, failure ] }
-    secrets: [ telegram_token, telegram_to ]
-    message: |
-      *{{repo.owner}}/{{repo.name}} [{{commit.branch}}]*: Build #{{build.number}}: *{{uppercase build.status}}*
-      {{build.link}}
+    secrets: [ webhook_url, notify_token ]
